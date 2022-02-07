@@ -151,7 +151,8 @@ class AutoSendEvents:
                                 "precision" : time.time_ns() % 1000000
                         }
                         #await self._api.create_and_send_event_into_room(event_dict)
-                        await self._event_creation_handler.create_and_send_nonmember_event(requester, event_dict, None)
+                        self._event_creation_handler.create_and_send_nonmember_event
+                        await self._event_creation_handler.create_and_send_nonmember_event(requester, event_dict,ratelimit=False, None)
                 except Exception as e:
                     logger.info(traceback.format_exc())
                     return None;
