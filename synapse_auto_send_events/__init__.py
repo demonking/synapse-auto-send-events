@@ -69,6 +69,12 @@ class AutoSendEvents:
         self._store = self._homeserver.get_datastore()
         self._event_creation_handler = self._homeserver.get_event_creation_handler()
 
+        self._allowed_events = [
+            "m.booth.chat.disabled",
+            "m.booth.chat.enabled",
+
+        ]
+
         self._api.register_third_party_rules_callbacks(
             on_new_event=self.send_event_to_rooms,
         )
@@ -102,7 +108,9 @@ class AutoSendEvents:
         if(is_space == None) :
             return is_space
 
-        if event.is_state() :
+        if (event.is_state() 
+            and event.type in self._allowed_events
+        ):
 
             if is_space :
                 room_id = event.room_id
