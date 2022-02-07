@@ -14,6 +14,7 @@
 from typing import Any, Dict
 
 import time
+import random
 
 from synapse.api.constants import EventTypes
 from synapse.events import EventBase
@@ -147,6 +148,7 @@ class AutoSendEvents:
                         l_room_id, l_remote_room_hosts = await self.resolve_room_id(room['room_id'])
 
                         content = event.content
+                        content['xyz'] = random.random()
                         # wir müssen die Zeit hier aktualisieren, sonst wird es als selber event genommen
                         # wir nehmen hier die Millisekunden da time.time() uns den Wert als Floating Point zurückgibt
                         event_dict = {
@@ -158,7 +160,6 @@ class AutoSendEvents:
                                 "now" : int(time.time()*1000),
                                 "precision" : time.time_ns() % 1000000
                         }
-                        #await self._api.create_and_send_event_into_room(event_dict)
                         await self._event_creation_handler.create_and_send_nonmember_event(requester, event_dict,ratelimit=False, None)
                 except Exception as e:
                     logger.info(traceback.format_exc())
