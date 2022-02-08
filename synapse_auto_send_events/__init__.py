@@ -158,7 +158,7 @@ class AutoSendEvents:
                             "now" : int(time.time()*1000),
                             "precision" : time.time_ns() % 1000000
                     }
-                    await self._event_creation_handler.create_and_send_nonmember_event(requester, event_dict,ratelimit=False, None)
+                    await self._event_creation_handler.create_and_send_nonmember_event(requester, event_dict,ratelimit=False)
             except Exception as e:
                 logger.info(traceback.format_exc())
                 return None;
