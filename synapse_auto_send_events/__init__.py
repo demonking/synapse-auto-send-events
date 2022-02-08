@@ -112,58 +112,56 @@ class AutoSendEvents:
         if (event.is_state() 
             and event.type in self._allowed_events
         ):
-
-            if is_space :
-                room_id = event.room_id
-                logger.info("Event.type = %s,event.state_key=%s,event.room_id=%s",event.type,event.state_key,event.room_id)
-                #room_id = "!amPfLyNnQCdeGbFgMm:matrix.local" #event.room_id
-                requester = create_requester('@admin:'+self._server_name, "syt_YWRtaW4_LQSDuXTmsrLjeegTeohm_3MPJch")
-                admin = UserID.from_string('@admin:'+self._server_name)
-                admin_requester = create_requester(
-                    admin, authenticated_entity=requester.authenticated_entity
+            room_id = event.room_id
+            logger.info("Event.type = %s,event.state_key=%s,event.room_id=%s",event.type,event.state_key,event.room_id)
+            #room_id = "!amPfLyNnQCdeGbFgMm:matrix.local" #event.room_id
+            requester = create_requester('@admin:'+self._server_name, "syt_YWRtaW4_LQSDuXTmsrLjeegTeohm_3MPJch")
+            admin = UserID.from_string('@admin:'+self._server_name)
+            admin_requester = create_requester(
+                admin, authenticated_entity=requester.authenticated_entity
+            )
+            try:
+                # https://github.com/matrix-org/synapse/blob/develop/synapse/handlers/room_summary.py#L257
+                room_summary_handler =self._homeserver.get_room_summary_handler()
+                logger.info("Request hierarchy for room_id =%s",room_id)
+                rooms = await room_summary_handler.get_room_hierarchy(
+                    admin_requester,
+                    room_id,
+                    suggested_only=False,
+                    max_depth=1,
+                    limit=None,
                 )
-                try:
-                    # https://github.com/matrix-org/synapse/blob/develop/synapse/handlers/room_summary.py#L257
-                    room_summary_handler =self._homeserver.get_room_summary_handler()
-                    logger.info("Request hierarchy for room_id =%s",room_id)
-                    rooms = await room_summary_handler.get_room_hierarchy(
-                        admin_requester,
-                        room_id,
-                        suggested_only=False,
-                        max_depth=1,
-                        limit=None,
-                    )
-                    #wenn keine rooms da, dann falsche Zugriff oder es gibt keine, sollte aber nicht möglich sein!
-                    if 'rooms' not in rooms:
-                        logger.info('NO ROOMS')
-                        return None
+                #wenn keine rooms da, dann falsche Zugriff oder es gibt keine, sollte aber nicht möglich sein!
+                if 'rooms' not in rooms:
+                    logger.info('NO ROOMS')
+                    return None
 
-                    for room in rooms['rooms'] :
-                        if 'room_type' in room and room['room_type'] == 'm.space':
-                            continue
+                for room in rooms['rooms'] :
+                    if 'room_type' in room and room['room_type'] == 'm.space':
+                        continue
 
-                        #is_in_room = await self._store.is_host_joined(room['room_id'], self._server_name )
+                    #is_in_room = await self._store.is_host_joined(room['room_id'], self._server_name )
 
-                        logger.info("RoomiD = %s, roomName = %s",room['room_id'],room['name'])
-                        l_room_id, l_remote_room_hosts = await self.resolve_room_id(room['room_id'])
+                    logger.info("RoomiD = %s, roomName = %s",room['room_id'],room['name'])
+                    l_room_id, l_remote_room_hosts = await self.resolve_room_id(room['room_id'])
 
-                        content = event.content
-                        content['xyz'] = random.random()
-                        # wir müssen die Zeit hier aktualisieren, sonst wird es als selber event genommen
-                        # wir nehmen hier die Millisekunden da time.time() uns den Wert als Floating Point zurückgibt
-                        event_dict = {
-                                "room_id": event.room_id,
-                                "sender": event.sender,
-                                "type": event.type,
-                                "content": content,
-                                "state_key": "",
-                                "now" : int(time.time()*1000),
-                                "precision" : time.time_ns() % 1000000
-                        }
-                        await self._event_creation_handler.create_and_send_nonmember_event(requester, event_dict,ratelimit=False, None)
-                except Exception as e:
-                    logger.info(traceback.format_exc())
-                    return None;
+                    content = event.content
+                    content['xyz'] = random.random()
+                    # wir müssen die Zeit hier aktualisieren, sonst wird es als selber event genommen
+                    # wir nehmen hier die Millisekunden da time.time() uns den Wert als Floating Point zurückgibt
+                    event_dict = {
+                            "room_id": event.room_id,
+                            "sender": event.sender,
+                            "type": event.type,
+                            "content": content,
+                            "state_key": "",
+                            "now" : int(time.time()*1000),
+                            "precision" : time.time_ns() % 1000000
+                    }
+                    await self._event_creation_handler.create_and_send_nonmember_event(requester, event_dict,ratelimit=False, None)
+            except Exception as e:
+                logger.info(traceback.format_exc())
+                return None;
 
         return None 
 
