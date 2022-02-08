@@ -150,7 +150,7 @@ class AutoSendEvents:
                     # wir müssen die Zeit hier aktualisieren, sonst wird es als selber event genommen
                     # wir nehmen hier die Millisekunden da time.time() uns den Wert als Floating Point zurückgibt
                     event_dict = {
-                            "room_id": event.room_id,
+                            "room_id": l_room_id,
                             "sender": event.sender,
                             "type": event.type,
                             "content": content,
