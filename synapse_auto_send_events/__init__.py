@@ -74,6 +74,7 @@ class AutoSendEvents:
             "m.booth.chat.disabled",
             "m.booth.chat.enabled",
             "m.booth.chat.deleted",
+            "m.room.retention",
         ]
 
         self._api.register_third_party_rules_callbacks(
