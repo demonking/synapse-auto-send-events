@@ -74,7 +74,7 @@ class AutoSendEvents:
             "m.booth.chat.disabled",
             "m.booth.chat.enabled",
             "m.booth.chat.deleted",
-            "m.room.retention",
+            "m.booth.retention",
         ]
 
         self._api.register_third_party_rules_callbacks(
@@ -136,7 +136,10 @@ class AutoSendEvents:
                 if 'rooms' not in rooms:
                     logger.info('NO ROOMS')
                     return None
-
+                /**/
+                if event.type == 'm.booth.retention' :
+                    event.type = 'm.room.retention';
+                    
                 for room in rooms['rooms'] :
                     if 'room_type' in room and room['room_type'] == 'm.space':
                         continue
