@@ -136,7 +136,7 @@ class AutoSendEvents:
                 if 'rooms' not in rooms:
                     logger.info('NO ROOMS')
                     return None
-                /**/
+                # müssen wir hier swappen, m.room.retention wird von Synapse auch verarbeitet
                 if event.type == 'm.booth.retention' :
                     event.type = 'm.room.retention';
                     
