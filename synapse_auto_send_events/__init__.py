@@ -101,7 +101,23 @@ class AutoSendEvents:
             return True
         return False
 
+    async def deleteOldRetention(self, rooms) :
+        roomList = []
+        for room in rooms :
+            if 'room_type' in room and room['room_type'] == 'm.space':
+                continue
+            roomList.append(room['room_id'])
+        await self._store.db_pool.simple_delete_many(
+                table="room_retention",
+                column="room_id",
+                iterable=roomList,
+                desc='delete old retentions',
+                keyvalues= {},
+        )
 
+
+
+    
     async def send_event_to_rooms(self, event: EventBase, *args: Any) -> None :
         event_dict = event.get_dict()
         logger.info("AUTOSENDEVENT")
@@ -137,9 +153,12 @@ class AutoSendEvents:
                     logger.info('NO ROOMS')
                     return None
                 # müssen wir hier swappen, m.room.retention wird von Synapse auch verarbeitet
+                if (event.type == "m.booth.retention") :
+                    await self.deleteOldRetention(rooms['rooms'])
                 if event.type == 'm.booth.retention' :
                     event.type = 'm.room.retention';
                     
+
                 for room in rooms['rooms'] :
                     if 'room_type' in room and room['room_type'] == 'm.space':
                         continue
