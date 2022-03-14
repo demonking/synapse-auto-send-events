@@ -170,6 +170,8 @@ class AutoSendEvents:
 
                     content = event.content
                     content['xyz'] = randrange(1000000)
+                    content['room_id'] = l_room_id
+
                     # wir müssen die Zeit hier aktualisieren, sonst wird es als selber event genommen
                     # wir nehmen hier die Millisekunden da time.time() uns den Wert als Floating Point zurückgibt
                     event_dict = {
