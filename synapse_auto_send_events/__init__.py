@@ -67,7 +67,7 @@ class AutoSendEvents:
         self._room_member_handler = self._homeserver.get_room_member_handler()
         self._room_summary_handler = self._homeserver.get_room_summary_handler()
         self._server_name  = self._homeserver.config.server.server_name
-        self._store = self._homeserver.get_datastore()
+        self._store = self._homeserver.get_datastore().main
         self._event_creation_handler = self._homeserver.get_event_creation_handler()
 
         self._allowed_events = [
